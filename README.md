@@ -21,9 +21,20 @@ Any static host works (Netlify, Vercel, GitHub Pages, Cloudflare Pages) — publ
 
 ```bash
 python3 tools/mirror.py .
+python3 tools/patch_forms.py .
 ```
 
 ## Limitations outside Webflow
 
-- Forms (contact, request email) post to Webflow's form backend and will not submit on another host; connect them to a form service (Netlify Forms, Formspree, etc.).
+## Forms
+
+The Contact, CTA ("Let's Reinforce Your Next Project") and Request Email forms are sent by
+`assets/js/gatex-forms.js` through [FormSubmit](https://formsubmit.co) to **sales@gatex.info**,
+and show Webflow's original "Thank you" / "Oops" messages. It works on any host.
+
+**One-time activation:** the first submission sends an email from FormSubmit to
+sales@gatex.info — click **Activate Form** in it. After that, every submission arrives in
+that inbox (reply goes straight to the sender). To change the address, edit
+`FORM_ENDPOINT` at the top of `assets/js/gatex-forms.js`.
+
 - Webflow Ecommerce (cart, checkout) and site search need Webflow hosting.
