@@ -26,8 +26,9 @@ asset_re = re.compile(r'https?://(?:%s)/(?:[^\s"\'()<>,]|\(\d+\))+' % "|".join(r
 def localize(text, depth_prefix):
     def rep(m):
         url = m.group(0)
-        if url.endswith("&quot;") : url=url[:-6]
-        return "/" + asset_local(url)
+        suffix = ""
+        if "&quot;" in url: url, suffix = url.split("&quot;", 1)[0], "&quot;"
+        return "/" + asset_local(url) + suffix
     return asset_re.sub(rep, text)
 pages = {}
 queue = list(seeds); seen=set()
