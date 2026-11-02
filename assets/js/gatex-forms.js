@@ -9,7 +9,7 @@
  */
 (function () {
   var FORM_ENDPOINT = "https://api.web3forms.com/submit";
-  var ACCESS_KEY = "be87900f-06e6-4e39-8bd0-b1a1d9e70665";
+  var ACCESS_KEY = "1f539d1e-8e0d-41d9-9614-b69f5f85b07c";
 
   // Readable labels for Webflow's generated field names.
   var LABELS = {
