@@ -3,13 +3,13 @@
  * without Webflow hosting. Replaces Webflow's form handler on these forms and
  * keeps Webflow's own "Thank you" / "Oops" messages.
  *
- * Backend: FormSubmit (https://formsubmit.co). The first submission sends an
- * activation email to FORM_ENDPOINT's address; click "Activate" once and all
- * later submissions arrive in that inbox. To hide the address, replace it with
- * the random string FormSubmit gives you after activation.
+ * Backend: Web3Forms (https://web3forms.com). Submissions are emailed to the
+ * address the access key was created for (sales@gatex.info). The access key is
+ * meant to be public; manage it or change the recipient at web3forms.com.
  */
 (function () {
-  var FORM_ENDPOINT = "https://formsubmit.co/ajax/sales@gatex.info";
+  var FORM_ENDPOINT = "https://api.web3forms.com/submit";
+  var ACCESS_KEY = "be87900f-06e6-4e39-8bd0-b1a1d9e70665";
 
   // Readable labels for Webflow's generated field names.
   var LABELS = {
@@ -36,25 +36,26 @@
   }
 
   function collect(form, kind) {
-    var data = {};
+    var data = {
+      access_key: ACCESS_KEY,
+      subject: kind === "request-email"
+        ? "GATEX website: Request Email (Client ID)"
+        : "GATEX website: New contact request",
+      from_name: "GATEX Website"
+    };
     var fields = form.querySelectorAll("input, select, textarea");
     for (var i = 0; i < fields.length; i++) {
       var el = fields[i];
-      if (!el.name || el.type === "submit" || el.name.indexOf("cf-turnstile") === 0) continue;
+      if (!el.name || el.type === "submit" || el.name === "botcheck" ||
+          el.name.indexOf("cf-turnstile") === 0) continue;
       var label = LABELS[el.name] || el.getAttribute("data-name") || el.name;
       if (kind === "request-email" && el.name === "name-3") label = "Client ID";
-      var value = el.tagName === "SELECT" && el.selectedIndex > 0
+      data[label] = el.tagName === "SELECT" && el.selectedIndex > 0
         ? el.options[el.selectedIndex].text
         : el.value;
-      data[label] = value;
     }
     var email = form.querySelector('input[type="email"]');
-    if (email) data._replyto = email.value;
-    data._subject = kind === "request-email"
-      ? "GATEX website: Request Email (Client ID)"
-      : "GATEX website: New contact request";
-    data._template = "table";
-    data._captcha = "false";
+    if (email) data.replyto = email.value;
     data.Page = window.location.href;
     return data;
   }
@@ -80,8 +81,8 @@
     event.stopImmediatePropagation();
 
     // Honeypot: bots fill hidden fields, humans don't.
-    var trap = form.querySelector('input[name="_honey"]');
-    if (trap && trap.value) { show(form, true); return; }
+    var trap = form.querySelector('input[name="botcheck"]');
+    if (trap && trap.checked) { show(form, true); return; }
 
     var button = form.querySelector('input[type="submit"]');
     var label = button ? button.value : "";
@@ -90,15 +91,14 @@
       button.disabled = true;
     }
 
-    var kind = formKind(form);
     fetch(FORM_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(collect(form, kind))
+      body: JSON.stringify(collect(form, formKind(form)))
     })
       .then(function (res) {
         return res.json().then(function (body) {
-          var ok = res.ok && String(body.success) !== "false";
+          var ok = res.ok && body.success === true;
           show(form, ok);
           if (ok) form.reset();
         });
@@ -115,12 +115,11 @@
   document.addEventListener("DOMContentLoaded", function () {
     var forms = document.querySelectorAll("form[data-gatex-form]");
     for (var i = 0; i < forms.length; i++) {
-      if (forms[i].querySelector('input[name="_honey"]')) continue;
+      if (forms[i].querySelector('input[name="botcheck"]')) continue;
       var trap = document.createElement("input");
-      trap.type = "text";
-      trap.name = "_honey";
+      trap.type = "checkbox";
+      trap.name = "botcheck";
       trap.tabIndex = -1;
-      trap.autocomplete = "off";
       trap.setAttribute("aria-hidden", "true");
       trap.style.cssText = "position:absolute;left:-9999px;width:1px;height:1px;opacity:0";
       forms[i].appendChild(trap);

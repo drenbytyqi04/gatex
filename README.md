@@ -29,6 +29,17 @@ python3 tools/patch_forms.py .
 ## Forms
 
 The Contact, CTA ("Let's Reinforce Your Next Project") and Request Email forms are sent by
+`assets/js/gatex-forms.js` through [Web3Forms](https://web3forms.com) to **sales@gatex.info**,
+and show Webflow's original "Thank you" / "Oops" messages. It works on any host.
+
+The Web3Forms access key (`ACCESS_KEY` in that file) is public by design; it only
+lets the site send mail to sales@gatex.info. Manage it, or change the recipient, at web3forms.com.
+
+## Limitations outside Webflow
+
+## Forms
+
+The Contact, CTA ("Let's Reinforce Your Next Project") and Request Email forms are sent by
 `assets/js/gatex-forms.js` through [FormSubmit](https://formsubmit.co) to **sales@gatex.info**,
 and show Webflow's original "Thank you" / "Oops" messages. It works on any host.
 
