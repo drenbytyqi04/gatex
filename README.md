@@ -22,9 +22,8 @@ Any static host works (Netlify, Vercel, GitHub Pages, Cloudflare Pages) — publ
 ```bash
 python3 tools/mirror.py .
 python3 tools/patch_forms.py .
+python3 tools/seo.py .
 ```
-
-## Limitations outside Webflow
 
 ## Forms
 
@@ -35,17 +34,14 @@ and show Webflow's original "Thank you" / "Oops" messages. It works on any host.
 The Web3Forms access key (`ACCESS_KEY` in that file) is public by design; it only
 lets the site send mail to sales@gatex.info. Manage it, or change the recipient, at web3forms.com.
 
+## SEO
+
+`tools/seo.py` sets a unique title, meta description, Open Graph tags and an absolute
+canonical URL on every page, marks utility pages (checkout, search, password, request-email)
+as `noindex`, adds JSON-LD (Organization, WebSite, FAQPage, breadcrumbs), and writes
+`sitemap.xml` and `robots.txt`. Edit the `PAGES` table in that script to change the text for a page.
+`vercel.json` serves URLs without a trailing slash and caches static assets.
+
 ## Limitations outside Webflow
-
-## Forms
-
-The Contact, CTA ("Let's Reinforce Your Next Project") and Request Email forms are sent by
-`assets/js/gatex-forms.js` through [FormSubmit](https://formsubmit.co) to **sales@gatex.info**,
-and show Webflow's original "Thank you" / "Oops" messages. It works on any host.
-
-**One-time activation:** the first submission sends an email from FormSubmit to
-sales@gatex.info — click **Activate Form** in it. After that, every submission arrives in
-that inbox (reply goes straight to the sender). To change the address, edit
-`FORM_ENDPOINT` at the top of `assets/js/gatex-forms.js`.
 
 - Webflow Ecommerce (cart, checkout) and site search need Webflow hosting.
